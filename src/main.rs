@@ -43,18 +43,9 @@ pub fn check_for_written_number(input: &str) -> Vec<WrittenNumber> {
     let mut output: Vec<WrittenNumber> = Vec::new();
     let mut final_out: Vec<WrittenNumber> = Vec::new();
 
-    let written_numbers = [
-        String::from("one"),
-        String::from("two"),
-        String::from("three"),
-        String::from("four"),
-        String::from("five"),
-        String::from("six"),
-        String::from("seven"),
-        String::from("eight"),
-        String::from("nine"),
-    ];
+   
     let keys: HashMap<String, u8> = HashMap::from([
+        (String::from("eight"), 8),
         (String::from("one"), 1),
         (String::from("two"), 2),
         (String::from("three"), 3),
@@ -62,28 +53,35 @@ pub fn check_for_written_number(input: &str) -> Vec<WrittenNumber> {
         (String::from("five"), 5),
         (String::from("six"), 6),
         (String::from("seven"), 7),
-        (String::from("eight"), 8),
         (String::from("nine"), 9),
     ]);
-    for c in written_numbers.iter() {
-        println!("Erkennende Line: {:?}", c);
+    for (key, values) in &keys {
+        //println!("Erkennende Line: {:?}", c);
 
-        if input.contains(c) {
-            println!("Input Line: {:?}", input);
+        if input.contains(key) {
+            //println!("Input Line: {:?}", input);
 
-            let value = keys.get(&c.to_string()).unwrap();
-            let index = in_string.find(c).unwrap();
+            let value = keys.get(&key.to_string()).unwrap();
+            let index = in_string.find(key).unwrap();
             let final_number = WrittenNumber {
                 value: *value,
                 first_index: index,
             };
-            println!("Erkannt: {:?}", final_number);
+            println!("Final Number: {:?}", final_number);
 
             output.push(final_number);
+            
         }
     }
+    println!("OP Erkannt: {:?}", output);
+
+    output.sort_by(|a,b | a.first_index.cmp(&b.first_index));
+    println!("OP Erkannt: {:?}", output);
+
     final_out.push(output[0]);
     final_out.push(output[output.len()-1]);
+    println!("Final Out: {:?}", final_out);
+
     final_out
 }
 
@@ -102,31 +100,49 @@ pub fn day1_2(input: &str) {
     let mut numbers: Vec<String> = Vec::new();
     let mut index: usize = 0;
     let mut number: char = 'a';
+
     for entry in numerics.iter() {
+        let mut numeric = false;
 
         let wordnumbers = check_for_written_number(entry);
+        println!("Wordnumbers: {:?}", wordnumbers);
+
         let mut num_str: String = String::new();
         for c in entry.chars() {
+            numeric = false;
+
             if c.is_numeric() {
+                numeric = true;
                 number = c;
                 index = entry.find(c).unwrap();
                 if index < wordnumbers[0].first_index && num_str.len() == 0 {
+                    //println!("Choosing {} over {}",index, wordnumbers[0].first_index);
+
                     num_str.push(c)
                 } else if index > wordnumbers[0].first_index && num_str.len() == 0  {
+                    //println!("Choosing {} over {}", wordnumbers[0].first_index, index);
+
                     num_str.push_str(&wordnumbers[0].value.to_string())
+
                 }
             }
+        }
+        if !numeric {
+            println!("Pushing");
+            num_str.push_str(&wordnumbers[0].value.to_string());
+            num_str.push_str(&wordnumbers[1].value.to_string());
+            println!("Num String: {:?}", num_str);
+
+
         }
         if index < wordnumbers[1].first_index {
             num_str.push_str(&wordnumbers[1].value.to_string())
         } else {
             num_str.push(number)
         }
-        println!("Num String: {:?}", num_str);
-
         numbers.push(num_str);
     }
-    println!("String: {:?}", numbers);
+    //println!("String: {:?}", numbers);
     let mut final_int: Vec<u16> = Vec::new();
     for n in numbers.iter() {
         let firstnum_str = n.chars().nth(0).unwrap();
@@ -143,7 +159,7 @@ pub fn day1_2(input: &str) {
 }
 
 fn main() {
-    let test_input = "eightwothree";
+    /*let test_input = "eightwothree";
     let result = check_for_written_number(test_input);
     
     let mut final_out: Vec<WrittenNumber> = Vec::new();
@@ -152,11 +168,12 @@ fn main() {
     if let Some(last_written_number) = result.last() {
         final_out.push(last_written_number.clone());
     }
-
     println!("Result: {:?}", final_out);
+
+    */
     
     //println!("Numbers: {:?}", check_for_written_number("eightwothree"));
     //day1_1("Inputs/Day1_1.txt")
-    //day1_2("Inputs/Day1_2_example.txt")
+    day1_2("Inputs/Day1_2_example.txt")
 
 }
